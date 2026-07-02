@@ -1,57 +1,74 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowRight, CheckSquare, Globe2, Mail, MapPinned, Smartphone } from 'lucide-react'
 import { SITE_CONFIG } from '@/lib/site-config'
 import { globalContent } from '@/editable/content/global.content'
 import { useEditableLocalAuthSession } from '@/editable/components/EditableLocalAuthForms'
 
+const HIDDEN_TASK_KEYS = new Set(['classified', 'profile'])
+
 export function EditableFooter() {
-  const taskLinks = SITE_CONFIG.tasks.filter((task) => task.enabled)
   const year = new Date().getFullYear()
   const { session, logout } = useEditableLocalAuthSession()
 
   return (
-    <footer className="border-t border-[var(--editable-border)] bg-[var(--editable-footer-bg)] text-[var(--editable-footer-text)]">
-      <div className="h-[2px] bg-[linear-gradient(90deg,transparent_0%,var(--slot4-accent)_50%,transparent_100%)]" />
-      <div className="mx-auto grid max-w-[var(--editable-container)] gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-8">
-        <div>
-          <Link href="/" className="inline-flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center border border-[var(--slot4-accent)]/40 bg-[var(--slot4-surface-bg)]">
-              <img src="/favicon.png?v=20260413" alt={SITE_CONFIG.name} className="h-8 w-8 object-contain" />
-            </span>
-            <span className="editable-display text-xl font-semibold tracking-[0.01em]">{SITE_CONFIG.name}</span>
-          </Link>
-          <p className="mt-4 max-w-md text-sm leading-7 text-[var(--slot4-muted-text)]">{globalContent.footer?.description || SITE_CONFIG.description}</p>
-        </div>
+    <footer className="border-t border-[#d7e6ef] bg-[var(--editable-footer-bg)] text-[var(--editable-footer-text)]">
+      <div className="mx-auto max-w-[var(--editable-container)] px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid gap-8 rounded-[2rem] bg-white p-6 shadow-[0_18px_40px_rgba(8,69,148,0.08)] lg:grid-cols-[1.25fr_0.85fr_1fr] lg:p-8">
+          <div>
+            <Link href="/" className="inline-flex items-center gap-3">
+              <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-[1.1rem] bg-[#10263b] shadow-[0_14px_30px_rgba(8,69,148,0.16)]">
+                <img src="/favicon.png?v=20260413" alt={SITE_CONFIG.name} className="h-full w-full object-cover" />
+              </span>
+              <span>
+                <span className="editable-display block text-3xl font-extrabold tracking-[-0.05em] text-[#12324a]">{SITE_CONFIG.name}</span>
+                <span className="block text-xs font-extrabold uppercase tracking-[0.22em] text-[#5a7790]">{globalContent.footer?.tagline}</span>
+              </span>
+            </Link>
+            <p className="mt-5 max-w-md text-sm leading-8 text-[#5a7790]">{globalContent.footer?.description || SITE_CONFIG.description}</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#fff3cc] px-4 py-2 text-sm font-extrabold text-[#8d5c00]">
+                <CheckSquare className="h-4 w-4" /> Clear sections
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#e6f8f6] px-4 py-2 text-sm font-extrabold text-[#006f6b]">
+                <Globe2 className="h-4 w-4" /> Easy discovery
+              </span>
+            </div>
+          </div>
 
-        <div>
-          <h3 className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--slot4-accent)]">Explore</h3>
-          <div className="mt-4 grid gap-2">
-            {taskLinks.map((task) => (
-              <Link key={task.key} href={task.route} className="inline-flex items-center gap-2 text-sm font-medium text-[var(--slot4-muted-text)] transition hover:text-[var(--slot4-page-text)]">
-                {task.label} <ArrowUpRight className="h-3.5 w-3.5" />
-              </Link>
-            ))}
+          <div>
+            <h3 className="text-[11px] font-extrabold uppercase tracking-[0.24em] text-[#ff7f2a]">Site</h3>
+            <div className="mt-4 grid gap-3">
+              <Link href="/about" className="text-sm font-extrabold text-[#12324a] transition hover:text-[#084594]">About</Link>
+              <Link href="/contact" className="text-sm font-extrabold text-[#12324a] transition hover:text-[#084594]">Contact</Link>
+              {session ? <Link href="/create" className="text-sm font-extrabold text-[#12324a] transition hover:text-[#084594]">Create</Link> : null}
+              {!session ? <Link href="/login" className="text-sm font-extrabold text-[#12324a] transition hover:text-[#084594]">Login</Link> : null}
+              {!session ? <Link href="/signup" className="text-sm font-extrabold text-[#12324a] transition hover:text-[#084594]">Sign up</Link> : null}
+              {session ? <button type="button" onClick={logout} className="text-left text-sm font-extrabold text-[#12324a] transition hover:text-[#084594]">Logout</button> : null}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-[11px] font-extrabold uppercase tracking-[0.24em] text-[#ff7f2a]">Stay connected</h3>
+            <div className="mt-4 grid gap-3">
+              <div className="inline-flex items-center gap-3 rounded-[1rem] border border-[#d7e6ef] bg-[#f7fafc] px-4 py-3 text-sm font-extrabold text-[#12324a]">
+                <Mail className="h-4 w-4 text-[#008e89]" /> New posts and updates
+              </div>
+              <div className="inline-flex items-center gap-3 rounded-[1rem] border border-[#d7e6ef] bg-[#f7fafc] px-4 py-3 text-sm font-extrabold text-[#12324a]">
+                <Smartphone className="h-4 w-4 text-[#ff7f2a]" /> Mobile-friendly browsing
+              </div>
+              <div className="inline-flex items-center gap-3 rounded-[1rem] border border-[#d7e6ef] bg-[#f7fafc] px-4 py-3 text-sm font-extrabold text-[#12324a]">
+                <MapPinned className="h-4 w-4 text-[#084594]" /> Places, listings, and useful resources
+              </div>
+            </div>
           </div>
         </div>
 
-        <div>
-          <h3 className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--slot4-accent)]">Site</h3>
-          <div className="mt-4 grid gap-2">
-            {[
-              ['About', '/about'],
-              ['Contact', '/contact'],
-              ...(session ? [['Create', '/create']] : [['Login', '/login'], ['Sign up', '/signup']]),
-            ].map(([label, href]) => (
-              <Link key={href} href={href} className="text-sm font-medium text-[var(--slot4-muted-text)] transition hover:text-[var(--slot4-page-text)]">{label}</Link>
-            ))}
-            {session ? <button type="button" onClick={logout} className="text-left text-sm font-medium text-[var(--slot4-muted-text)] transition hover:text-[var(--slot4-page-text)]">Logout</button> : null}
-          </div>
+        <div className="mt-6 flex flex-col gap-2 text-center text-xs font-extrabold uppercase tracking-[0.16em] text-[#6f889c] sm:flex-row sm:items-center sm:justify-between">
+          <span>© {year} {SITE_CONFIG.name}</span>
+          <span>{globalContent.footer?.bottomNote}</span>
         </div>
-      </div>
-      <div className="border-t border-[var(--editable-border)] px-4 py-5 text-center text-xs font-medium tracking-[0.12em] text-[var(--slot4-muted-text)]">
-        © {year} {SITE_CONFIG.name}. All rights reserved.
       </div>
     </footer>
   )
