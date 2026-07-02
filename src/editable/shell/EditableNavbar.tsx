@@ -3,140 +3,165 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, Search, UserPlus, LogIn, X, PlusCircle } from 'lucide-react'
+import { ChevronDown, LogIn, MapPin, Menu, PlusCircle, Search, UserPlus, X } from 'lucide-react'
 import { SITE_CONFIG } from '@/lib/site-config'
 import { globalContent } from '@/editable/content/global.content'
 import { useEditableLocalAuthSession } from '@/editable/components/EditableLocalAuthForms'
+
+const HIDDEN_TASK_KEYS = new Set(['classified', 'profile'])
 
 export function EditableNavbar() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
   const { session, logout } = useEditableLocalAuthSession()
   const navItems = useMemo(
-    () => SITE_CONFIG.tasks.filter((task) => task.enabled).map((task) => ({ label: task.label, href: task.route })),
+    () => SITE_CONFIG.tasks.filter((task) => task.enabled && !HIDDEN_TASK_KEYS.has(task.key)).map((task) => ({ label: task.label, href: task.route })),
     []
   )
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--editable-nav-bg)]/96 text-[var(--editable-nav-text)] backdrop-blur-md">
-      <div className="h-[3px] bg-[linear-gradient(90deg,transparent_0%,var(--slot4-accent)_20%,var(--slot4-accent)_80%,transparent_100%)]" />
-
-      <nav className="mx-auto flex min-h-[76px] w-full max-w-[var(--editable-container)] items-center gap-5 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group flex shrink-0 items-center gap-3 border-r border-[var(--editable-border)] pr-5">
-          <span className="flex h-11 w-11 items-center justify-center border border-[var(--slot4-accent)]/45 bg-[var(--slot4-surface-bg)] transition group-hover:border-[var(--slot4-accent)]">
-            <img src="/favicon.png?v=20260413" alt={SITE_CONFIG.name} className="h-8 w-8 object-contain" />
-          </span>
-          <span className="hidden min-w-0 md:block">
-            <span className="editable-display block max-w-[200px] truncate text-xl font-semibold leading-none tracking-[0.01em]">{SITE_CONFIG.name}</span>
-            <span className="mt-1 block max-w-[200px] truncate text-[10px] font-medium uppercase tracking-[0.26em] text-[var(--slot4-muted-text)]">
-              {globalContent.nav?.tagline || SITE_CONFIG.tagline}
-            </span>
-          </span>
-        </Link>
-
-        <div className="hidden items-stretch gap-0 lg:flex">
-          {navItems.slice(0, 5).map((item) => {
-            const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative flex items-center px-4 text-[11px] font-semibold uppercase tracking-[0.22em] transition ${
-                  active ? 'text-[var(--slot4-accent)]' : 'text-[var(--slot4-muted-text)] hover:text-[var(--slot4-page-text)]'
-                }`}
-              >
-                {item.label}
-                {active ? <span className="absolute inset-x-3 bottom-0 h-[2px] bg-[var(--slot4-accent)]" /> : null}
-              </Link>
-            )
-          })}
+    <header className="sticky top-0 z-50 border-b border-[#24384e] bg-[var(--editable-nav-bg)] text-[var(--editable-nav-text)] shadow-[0_10px_24px_rgba(0,0,0,0.14)] backdrop-blur-md">
+      <div className="border-b border-white/10 bg-[#f5dfe2] text-[#10263b]">
+        <div className="mx-auto flex w-full max-w-[var(--editable-container)] items-center justify-between gap-3 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] sm:px-6 lg:px-8">
+          <span>Fresh freelancer-friendly discovery</span>
+          <span className="hidden items-center gap-2 sm:inline-flex"><MapPin className="h-3.5 w-3.5" /> Browse listings, articles, and useful finds</span>
         </div>
+      </div>
 
-        <form action="/search" className="mx-auto hidden min-w-0 flex-1 justify-center md:flex">
-          <label className="flex w-full max-w-md items-center gap-2 border-b border-[var(--slot4-accent)]/30 pb-2 transition focus-within:border-[var(--slot4-accent)]">
-            <Search className="h-4 w-4 shrink-0 text-[var(--slot4-accent)]" />
-            <input
-              name="q"
-              type="search"
-              placeholder="Search posts"
-              className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-[var(--slot4-muted-text)]"
-            />
-          </label>
-        </form>
+      <nav className="mx-auto flex w-full max-w-[var(--editable-container)] flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="group flex shrink-0 items-center gap-3">
+            <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-[1.1rem] bg-white shadow-[0_10px_28px_rgba(0,0,0,0.16)]">
+              <img src="/favicon.png?v=20260413" alt={SITE_CONFIG.name} className="h-full w-full object-cover" />
+            </span>
+            <span className="min-w-0">
+              <span className="editable-display block truncate text-3xl font-extrabold leading-none tracking-[-0.04em] text-white">
+                {SITE_CONFIG.name}
+              </span>
+              <span className="mt-1 block truncate text-xs font-bold uppercase tracking-[0.24em] text-[#9fc0d8]">
+                {globalContent.nav?.tagline || SITE_CONFIG.tagline}
+              </span>
+            </span>
+          </Link>
 
-        <div className="ml-auto flex shrink-0 items-center gap-2">
-          {session ? (
-            <>
-              <Link
-                href="/create"
-                className="hidden items-center gap-2 border border-[var(--slot4-accent)] bg-[var(--editable-cta-bg)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--editable-cta-text)] transition hover:opacity-90 sm:inline-flex"
-              >
-                <PlusCircle className="h-3.5 w-3.5" /> Create
-              </Link>
-              <button
-                type="button"
-                onClick={logout}
-                className="hidden items-center gap-2 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--slot4-muted-text)] transition hover:text-[var(--slot4-page-text)] sm:inline-flex"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="hidden items-center gap-2 border border-[var(--editable-border)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--slot4-muted-text)] transition hover:border-[var(--slot4-accent)]/40 hover:text-[var(--slot4-page-text)] sm:inline-flex"
-              >
-                <LogIn className="h-3.5 w-3.5" /> Login
-              </Link>
-              <Link
-                href="/signup"
-                className="hidden items-center gap-2 border border-[var(--slot4-accent)] bg-[var(--editable-cta-bg)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--editable-cta-text)] transition hover:opacity-90 sm:inline-flex"
-              >
-                <UserPlus className="h-3.5 w-3.5" /> Sign up
-              </Link>
-            </>
-          )}
+          <form action="/search" className="hidden min-w-0 flex-1 xl:flex">
+            <div className="flex w-full max-w-[620px] overflow-hidden rounded-[1rem] bg-white shadow-[0_14px_30px_rgba(0,0,0,0.18)]">
+              <div className="flex min-w-0 flex-1 items-center gap-3 px-4">
+                <Search className="h-5 w-5 shrink-0 text-[#6e8aa0]" />
+                <input
+                  name="q"
+                  type="search"
+                  placeholder="Search listings, skills, topics, or posts"
+                  className="min-w-0 flex-1 bg-transparent py-3.5 text-sm font-bold text-[#12324a] outline-none placeholder:text-[#7d95a8]"
+                />
+              </div>
+              <button className="bg-[#ff7f2a] px-6 text-sm font-extrabold text-white transition hover:brightness-95">Search</button>
+            </div>
+          </form>
+
+          <div className="ml-auto hidden items-center gap-3 lg:flex">
+            <div className="flex items-center gap-2 text-sm text-white/85">
+              <span className="rounded-full bg-white/10 px-3 py-2 font-bold">Browse</span>
+              <span className="inline-flex items-center gap-1 font-bold text-[#ffd32d]">India / INR <ChevronDown className="h-4 w-4" /></span>
+            </div>
+            {session ? (
+              <>
+                <Link
+                  href="/create"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#ff7f2a] px-5 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-white transition hover:brightness-95"
+                >
+                  <PlusCircle className="h-4 w-4" /> Create
+                </Link>
+                <button type="button" onClick={logout} className="text-sm font-extrabold text-white/85 transition hover:text-[#ffd32d]">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm font-extrabold text-white/85 transition hover:text-[#ffd32d]">
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/18 bg-white/8 px-5 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-white/14"
+                >
+                  <UserPlus className="h-4 w-4" /> Sign up
+                </Link>
+              </>
+            )}
+          </div>
+
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
-            className="border border-[var(--editable-border)] bg-[var(--slot4-surface-bg)] p-2 lg:hidden"
+            className="ml-auto rounded-[1rem] border border-white/15 bg-white/10 p-3 text-white lg:hidden"
             aria-label="Toggle menu"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
-      </nav>
 
-      <div className="h-px bg-[var(--editable-border)]" />
-
-      {open ? (
-        <div className="border-t border-[var(--editable-border)] bg-[var(--editable-nav-bg)] px-4 py-5 lg:hidden">
-          <form action="/search" className="mb-5 flex items-center gap-2 border-b border-[var(--slot4-accent)]/30 pb-2">
-            <Search className="h-4 w-4 text-[var(--slot4-accent)]" />
-            <input name="q" type="search" placeholder="Search posts" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--slot4-muted-text)]" />
-          </form>
-          <div className="grid gap-1">
-            {[{ label: 'Home', href: '/' }, ...navItems, { label: 'Contact', href: '/contact' }, ...(session ? [{ label: 'Create', href: '/create' }] : [{ label: 'Login', href: '/login' }, { label: 'Sign up', href: '/signup' }])].map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={`border-l-2 px-4 py-3 text-sm font-semibold uppercase tracking-[0.16em] ${
-                    active
-                      ? 'border-[var(--slot4-accent)] bg-[var(--slot4-surface-bg)] text-[var(--slot4-accent)]'
-                      : 'border-transparent text-[var(--slot4-muted-text)] hover:border-[var(--slot4-accent)]/40 hover:bg-[var(--slot4-surface-bg)]'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              )
-            })}
-          </div>
+        <div className="hidden items-center gap-2 overflow-x-auto pb-1 lg:flex">
+          {navItems.slice(0, 7).map((item, index) => {
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`inline-flex shrink-0 items-center rounded-full px-4 py-2.5 text-sm font-extrabold transition ${
+                  active
+                    ? 'bg-[#ffd32d] text-[#10263b]'
+                    : index === 0
+                      ? 'bg-white/8 text-white hover:bg-white/14'
+                      : 'text-white/82 hover:bg-white/8 hover:text-white'
+                }`}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
         </div>
-      ) : null}
+
+        {open ? (
+          <div className="grid gap-4 border-t border-white/10 pt-4 lg:hidden">
+            <form action="/search" className="flex overflow-hidden rounded-[1rem] bg-white">
+              <div className="flex min-w-0 flex-1 items-center gap-3 px-4">
+                <Search className="h-5 w-5 shrink-0 text-[#6e8aa0]" />
+                <input
+                  name="q"
+                  type="search"
+                  placeholder="Search the site"
+                  className="min-w-0 flex-1 bg-transparent py-3 text-sm font-bold text-[#12324a] outline-none placeholder:text-[#7d95a8]"
+                />
+              </div>
+              <button className="bg-[#ff7f2a] px-5 text-sm font-extrabold text-white">Go</button>
+            </form>
+
+            <div className="grid gap-2">
+              {[{ label: 'Home', href: '/' }, ...navItems, { label: 'Contact', href: '/contact' }, ...(session ? [{ label: 'Create', href: '/create' }] : [{ label: 'Login', href: '/login' }, { label: 'Sign up', href: '/signup' }])].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={`rounded-[1rem] px-4 py-3 text-sm font-extrabold transition ${
+                      active ? 'bg-[#ffd32d] text-[#10263b]' : 'bg-white/6 text-white/88 hover:bg-white/10'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              })}
+              {session ? (
+                <button type="button" onClick={logout} className="rounded-[1rem] bg-white/6 px-4 py-3 text-left text-sm font-extrabold text-white/88 hover:bg-white/10">
+                  Logout
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+      </nav>
     </header>
   )
 }
